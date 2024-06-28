@@ -1,0 +1,41 @@
+-- Query 1
+SELECT v.NomVille, COUNT(c.NumCinéma) AS NombreCinémas
+FROM Ville v
+LEFT JOIN Cinéma c ON v.CodePostal = c.#CodePostal
+GROUP BY v.NomVille;
+
+-- Query 2
+SELECT c.NomCinéma, SUM(s.Capacité) AS CapacitéTotale
+FROM Cinéma c
+JOIN Salle s ON c.NumCinéma = s.#NumCinéma
+GROUP BY c.NomCinéma;
+
+-- Query 3
+SELECT f.Titre, p.NbreEntrées, s.Capacité
+FROM Film f
+JOIN Projection p ON f.NumFilm = p.#NumFilm
+JOIN Salle s ON p.#NumSalle = s.NumSalle
+WHERE p.NbreEntrées <= 0.3 * s.Capacité;
+
+-- Query 4
+SELECT f.Producteur, COUNT(p.Num_P) AS NombreFilmsProjetés
+FROM Film f
+JOIN Projection p ON f.NumFilm = p.#NumFilm
+WHERE p.Date = '2011-08-25'
+GROUP BY f.Producteur;
+
+-- Query 5
+SELECT f.Titre, COUNT(p.Num_P) AS NombreProjections
+FROM Film f
+JOIN Projection p ON f.NumFilm = p.#NumFilm
+WHERE p.Date BETWEEN '2011-10-20' AND '2011-10-25'
+GROUP BY f.Titre;
+
+-- Query 6
+SELECT f.Titre
+FROM Film f
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Projection p
+    WHERE p.#NumFilm = f.NumFilm AND p.Date >= DATEADD(YEAR, -3, GETDATE())
+);

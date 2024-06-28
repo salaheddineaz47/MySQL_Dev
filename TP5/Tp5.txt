@@ -1,0 +1,772 @@
+create database tp05;
+    drop database tp05;
+	use tp05;
+	drop table employe;
+	create table Employe
+		(Num_emp int primary key,
+		nom_emp varchar(30),
+		prenom_emp varchar(30),
+		fonction_emp varchar(30),
+		dateNaissance_Emp date,
+		dateEmbauche_emp date,
+		salaire_emp decimal(10,2),
+		superieur_emp int,
+		num_dep int,
+		foreign key (superieur_emp) references Employe(num_emp),
+		foreign key (num_dep) references Departement(num_dep));
+        
+	create table Departement(
+		num_dep int primary key,
+		nom_dep varchar(30), 
+		ville_dep varchar(30));
+	select * from departement;
+    select * from employe;
+	insert into Departement values
+	(4, "comptabilite", "marrakech"),
+	(5, "ressources humaines", "marrakech"),
+	(10, "informatique", "casablanca"),
+	(20, "marketing", "rabat"),
+	(30, "Finance", "Tangier");
+	drop table Departement;
+	drop table employe;
+	
+    insert into employe values (1, "Jaber", "Mohamed Reda", "Chef", '1963-12-17', '2020-01-01', 3150.00, NULL, 20),
+	(2, "Mansouri", "Mohssen", "ouvrier", '1949-07-02', '2019-02-02', 1500.00, 1, 30),
+	(3, "Colombos", "Neven", "president", '1964-03-10', '2018-03-03', 18000.00, 1, 30),
+	(4, "Monsef", "Chadia", "Chef", '1851-01-04', '2017-04-04', 15000.00, NULL, 10),
+	(5, "Salmi", "Wahid", "cadre", '1961-12-05', '2016-05-05', 17320.00, 4, 20),
+	(6, "Chraibich", "Nour Al Houda", "ouvrier", '1949-08-03', '2015-06-06', 1500.00, 4, 20),
+	(7, "daoud", "Imane", "secretaire", '1999-08-03', '2017-06-06', 11500.00, 1, 10),
+	(8, "Boufra", "Redouane", "vendeur", '1999-08-02', '2021-06-06', 2500.00, 4, 30),
+	(9, "Hicham", "Ouadie", "vendeur", '2001-04-16', '2022-06-06', 3500.00, 3, 5),
+	(10, "Ait sama", "Oualid", "ingenieur", '2000-09-16', '2023-09-06', 2790.00, 4, 4),
+	(11, "Ait sama", "Said", "ingenieur", '2000-09-16', '2023-09-06', 1990.00, 4, 4),
+	(12, "Ait saidi", "Said", "president", '1999-08-02', '2023-09-06', 15790.00, 4, 4),
+	(13, "Ait saidi", "ouissam", "secretaire", '1999-08-02', '2023-09-06', 15790.00, 4, 10),
+	(14, "Mahmoudi", "ayman", "secretaire", '1999-08-02', '2023-09-06', 15740.00, 1, 10),
+	(1035, "Najib", "Mohamed", "Chef", '1999-08-02', '2023-09-06', 13790.00, null, 10);
+	drop table employe;
+	-- 1
+	select  e.nom_emp, e.prenom_emp, d.ville_dep
+	from employe e inner join departement d
+	on e.num_dep = d.num_dep
+	order by e.num_emp;
+	--  QUESTION 02:
+	select  d.ville_dep
+	from employe e inner join departement d
+	on e.num_dep = d.num_dep
+	where e.num_emp = "1035";
+
+	select *from employe;
+	-- 3
+	select e.nom_emp, e.fonction_emp, d.nom_dep
+	from employe e inner join departement d
+	on e.num_dep = d.num_dep
+	where e.num_dep in (30, 20);
+
+	-- 4
+	select concat(nom_emp, ' ', prenom_emp) as nom_complet
+	from employe
+	where salaire_emp = (select max(salaire_emp) from employe);
+	select * from employe;
+	-- 5 
+	select num_emp, concat(nom_emp, prenom_emp) as nom_complet
+	from employe
+	where length(concat(nom_emp, prenom_emp)) = (select max(length(concat(nom_emp, prenom_emp)))  from employe);
+
+	select * from employe;
+	-- 6 
+	select e.num_emp, concat("l'employe: <<", concat(e.nom_emp, ' ', e.prenom_emp), ">> est age de ", timestampdiff(year,e.dateNaissance_emp, Curdate()), " il travaille dans le departement <<", d.nom_dep, ">>")
+	from employe e inner join departement d
+	on e.num_dep = d.num_dep
+	order by e.num_emp;
+
+	
+	-- 7 
+	select num_emp, nom_emp, fonction_emp, salaire_emp
+	from employe
+	where salaire_emp > (select salaire_emp from employe where num_emp = 1035);
+
+	-- 8 
+	select num_emp,  nom_emp, fonction_emp
+	from employe
+	where salaire_emp > all (select salaire_emp from employe where nom_emp = "Mahmoudi");
+
+	-- 9 
+	select distinct d.nom_dep
+	from employe e inner join departement d
+	on e.num_dep = d.num_dep
+	where e.salaire_emp >3000;
+
+	-- 10 
+	SELECT fonction_emp, AVG(salaire_emp) AS AvgSalary
+	FROM Employe
+	GROUP BY fonction_emp
+	HAVING AVG(salaire_emp) < (SELECT AVG(salaire_emp) FROM Employe WHERE fonction_emp = 'ingenieur');
+	select nom_emp, superieur_emp
+    from employe;
+	
+    -- 11
+    select e1.nom_emp, e2.nom_emp as chef
+    from employe e1
+    inner join employe e2 on  e2.num_emp = e1.superieur_emp;
+    
+    -- 12 
+    select e1.nom_emp, e1.salaire_emp
+    from employe e1
+    inner join employe e2 on e1.superieur_emp = e2.num_emp
+    where e1.salaire_emp > e2.salaire_emp;
+    
+    -- 13
+    select e1.nom_emp, e2.nom_emp as chef
+    from employe e1
+    left join employe e2 on e1.superieur_emp = e2.num_emp;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    -- Exercice 2:
+
+use tp05;
+create table CLIENTS(
+codeclt int primary key,
+nomclt varchar(30),
+prenomclt varchar(30),
+adresseclt varchar(30),
+CPclt int,
+ville varchar(30)
+);
+
+create table representant(
+coderep int primary key,
+nomrep varchar(30),
+prenomrep varchar(30)
+);
+
+create table appartement (
+ref int primary key,
+superfice int,
+pxvente int,
+secteur varchar(30),
+coderep int,
+codeclt int,
+foreign key (coderep) references representant(coderep),
+foreign key (codeclt) references clients(codeclt)
+);
+drop table appartement;
+select * from clients;
+select * from representant;
+select * from appartement;
+
+select secteur,avg(pxvente) from appartement group by secteur;
+select secteur,count(secteur) as 'nombre apartement' from appartement group by secteur having count(secteur) > 3;
+select count(superfice) as 'nombre apartement' from appartement where superfice > 80;  
+select secteur, max(pxvente) as 'prix_max' from appartement group by secteur having count(ref) > 3;
+select e.codeclt,concat(e.nomclt,' ',e.prenomclt) as 'Nom complet',a.ref,a.secteur from clients e inner join appartement a using(codeclt);
+select * from appartement a inner join representant r on a.coderep = r.coderep where secteur = 'Downtown' and a.coderep = 103;                
+select a.secteur,count(c.codeclt) from appartement a inner join clients c using(codeclt) where c.ville = 'Miami' group by a.secteur;
+
+
+
+-- Exercice 3:
+use tp05;
+create database tp05;
+drop database tp05;
+create table Service (
+numser int primary key,
+nomservice varchar(30),
+lieu varchar(30)
+);
+
+create table projet (
+codeprj int primary key,
+nomprj varchar(30),
+datedebut date,
+datefin date
+);
+
+create table Salarie (
+Matricule int primary key,
+nom varchar(30),
+poste varchar(30),
+email varchar(30),
+datemb date,
+salaire float,
+numser int,
+prime int,
+foreign key (numser) references service(numser)
+);
+
+drop table Salarie;
+create table participation (
+matricule int,
+codeprojet int,
+fonction varchar(30),
+nbrjours int,
+primary key (matricule,codeprojet),
+foreign key (matricule) references salarie(matricule),
+foreign key (codeprojet) references projet(codeprj)
+);
+
+insert into salarie values (1, "nom1", "poste1", "email1@email.com", "2000-10-12", 4000, 0606060606, 500, 1);
+insert into service values (1, "nomser1", "lieu1"),
+(2, "nomser2", "lieu2"),
+(3, "nomser3", "lieu3"),
+(4, "nomser4", "lieu4"),
+(5, "nomser5", "lieu5"),
+(6, "nomser6", "lieu6"),
+(7, "nomser7", "lieu7"),
+(8, "nomser8", "lieu8"),
+(9, "nomser9", "lieu9"),
+(10, "nomser10", "lieu10");
+
+drop table participation;
+insert into participation (matricule, codeprojet, fonction, nbrjours) values
+(1, 101, 'Developer', 10),
+(2, 102, 'Manager', 15),
+(3, 103, 'Tester', 12),
+(4, 101, 'Developer', 8),
+(5, 102, 'Designer', 10),
+(6, 103, 'Tester', 14),
+(7, 101, 'Manager', 20),
+(8, 102, 'Tester', 8),
+(9, 103, 'Developer', 15),
+(10, 101, 'Developer', 10),
+(11, 102, 'Designer', 12),
+(12, 103, 'Manager', 14),
+(1, 102, 'Developer', 10),
+(2, 103, 'Manager', 15),
+(3, 101, 'Tester', 12),
+(4, 102, 'Developer', 8),
+(5, 103, 'Designer', 10),
+(6, 101, 'Tester', 14),
+(7, 102, 'Manager', 20),
+(8, 103, 'Tester', 8),
+(9, 101, 'Developer', 15),
+(10, 102, 'Developer', 10),
+(11, 103, 'Designer', 12),
+(12, 101, 'Manager', 14);
+
+select * from salarie;
+select * from service;
+select * from projet;
+select * from participation;
+
+select numser,max(salaire) from salarie group by numser;
+select e.numser,s.nomservice,e.salaire from salarie e inner join service s using(numser) where numser = 10;
+select e.matricule,e.nom,count(p.matricule),sum(p.nbrjours) from salarie e inner join participation p using(matricule) group by e.matricule;
+select e.numser,s.nomservice,sum(e.salaire)+sum(e.prime) from salarie e inner join service s using(numser) group by numser;
+select e.numser,s.nomservice,count(e.matricule) from salarie e inner join service s using(numser) where e.salaire > (select avg(salaire) from salarie where poste != 'Manager') group by numser;
+select e.matricule,e.nom from salarie e left join participation p using(matricule) where p.matricule is null;
+select e.matricule,e.nom from salarie e left join participation p using(matricule) group by e.matricule having count(p.matricule) >= 2;
+
+
+-- Exercice 4:
+use tp05;
+create table patient(
+idpt int primary key,
+nom varchar(30),
+sexe varchar(30),
+adresse varchar(30),
+ville varchar(30)
+);
+
+create table medecin (
+idmed int primary key,
+nom varchar(30),
+adresse varchar(30),
+specialite varchar(30)
+);
+
+create table consultation (
+Nocons int primary key,
+idpt int,
+idmed int,
+datee date,
+prix int,
+foreign key (idpt) references patient(idpt),
+foreign key (idmed) references medecin(idmed)
+);
+
+select * from patient;
+select * from medecin;
+select * from consultation;
+
+
+select specialite,count(idmed) from medecin group by specialite; 
+select m.nom,count(c.nocons) from medecin m inner join consultation c using(idmed) group by idmed;
+select p.nom,count(c.nocons) from patient p inner join consultation c using(idpt) group by p.idpt;
+
+    
+    
+    
+    
+select  max(length(concat(nom_emp, prenom_emp))) as nom_complet
+from employe;
+
+
+
+
+-- ex 03
+use exercice3tp4;
+select * from employe;
+select * from departement;
+create table responsable(
+respo int primary key,
+nom_res varchar(30),
+prenom_res varchar(30)
+);
+select * from responsable;
+alter table employe add column sup_emp int;
+alter table responsable add column sup_salaire int;
+alter table employe add foreign key (sup_emp) references responsable(respo);
+
+select e.nom_emp,e.prenom_emp,d.ville_dep from employe e inner join departement d on e.num_dep = d.num_dep;
+
+select e.nom_emp,d.ville_dep from employe e inner join departement d on e.num_dep = d.num_dep where e.num_emp = 7;
+
+select e.nom_emp,e.fonction_emp,d.nom_dep from employe e inner join departement d on e.num_dep = d.num_dep where e.num_dep in (20,30);
+
+select concat(nom_emp,prenom_emp) as 'Nom complet',salaire_emp from employe where salaire_emp = (select max(salaire_emp) from employe);
+
+select max(length(nom_emp) + length(prenom_emp)) from employe;
+
+select num_emp,concat(nom_emp,' ',prenom_emp) as nom_complet,length(nom_emp) + length(prenom_emp) as 'length nom' 
+from employe where length(nom_emp) + length(prenom_emp) = (select max(length(nom_emp) + length(prenom_emp)) from employe);
+
+select num_emp,concat("L'employe",' ',e.nom_emp,' ',e.prenom_emp,' ','est age de',' ',timestampdiff(year,e.datenaissance_emp,curdate()),' ','ans.',' ','il travaille dans le departement',' ',d.nom_dep) as 'Liste demploye' 
+from employe e inner join departement d using(num_dep) ;
+
+select nom_emp,salaire_emp,fonction_emp from employe where salaire_emp > (select salaire_emp from employe where num_emp = 2);
+
+select nom_emp,salaire_emp,fonction_emp from employe where salaire_emp > (select salaire_emp from employe where nom_emp = 'Mohamed');
+
+select distinct d.nom_dep from departement d inner join employe e using(num_dep) where salaire_emp > 3000;
+
+select nom_emp,sup_emp from employe;
+select concat(e.nom_emp,' ',e.prenom_emp) as 'nom complet employe',concat(r.nom_res,'   ',r.prenom_res) as 'nom complet responsable' 
+from employe e inner join responsable r on e.sup_emp = r.respo;
+
+select concat(e.nom_emp,' ',e.prenom_emp) as 'nom complet employe',e.salaire_emp,concat(r.nom_res,'   ',r.prenom_res) as 'nom complet responsable',r.sup_salaire
+from employe e left outer join responsable r on e.sup_emp = r.respo where e.salaire_emp > r.sup_salaire;
+
+select concat(e.nom_emp,' ',e.prenom_emp) as 'nom complet employe',concat(r.nom_res,'   ',r.prenom_res) as 'nom complet responsable' 
+from employe e left outer join responsable r on e.sup_emp = r.respo;
+
+select distinct fonction_emp from employe group by fonction_emp having avg(case when fonction_emp not in ('directeur') then 1 end) < avg(case when fonction_emp = 'directeur' then 1 end);
+
+-- Exercice 2:
+
+create database exercice2tp5;
+use exercice2tp5;
+create table CLIENTS(
+codeclt int primary key,
+nomclt varchar(30),
+prenomclt varchar(30),
+adresseclt varchar(30),
+CPclt int,
+ville varchar(30)
+);
+
+create table representant(
+coderep int primary key,
+nomrep varchar(30),
+prenomrep varchar(30)
+);
+
+create table appartement (
+ref int primary key,
+superfice int,
+pxvente int,
+secteur varchar(30),
+coderep int,
+codeclt int,
+foreign key (coderep) references representant(coderep),
+foreign key (codeclt) references clients(codeclt)
+);
+select * from clients;
+select * from representant;
+select * from appartement;
+
+
+select secteur,avg(pxvente) from appartement group by secteur;
+
+select secteur,count(ref) as 'nombre apartement' from appartement group by secteur having count(ref) > 3;
+
+select secteur,count(ref) as 'nombre apartement' from appartement where superfice > 80 group by secteur;
+
+select secteur, max(pxvente) as 'prix_max' from appartement group by secteur having count(ref) > 4;
+
+select * from clients e inner join appartement a using(codeclt);
+
+select * from appartement a inner join representant r on a.coderep = r.coderep where secteur = 'Downtown' and r.nomrep = 'Gonzalez' and r.prenomrep = 'Juan';
+
+select a.secteur,count(c.codeclt) from appartement a inner join clients c using(codeclt) where c.ville = 'Miami' group by a.secteur;
+
+
+
+-- Exercice 3:
+create database exercice3tp5;
+use exercice3tp5;
+
+create table Service (
+numser int primary key,
+nomservice varchar(30),
+lieu varchar(30)
+);
+
+create table projet (
+codeprj int primary key,
+nomprj varchar(30),
+datedebut date,
+datefin date
+);
+
+create table Salarie (
+Matricule int primary key,
+nom varchar(30),
+poste varchar(30),
+email varchar(30),
+datemb date,
+salaire float,
+numser int,
+prime int,
+foreign key (numser) references service(numser)
+);
+
+drop table salaire;
+create table participation (
+matricule int,
+codeprojet int,
+fonction varchar(30),
+nbrjours int,
+primary key (matricule,codeprojet),
+foreign key (matricule) references salarie(matricule),
+foreign key (codeprojet) references projet(codeprj)
+);
+
+drop table participation;
+insert into participation (matricule, codeprojet, fonction, nbrjours) values
+(1, 101, 'Developer', 10),
+(2, 102, 'Manager', 15),
+(3, 103, 'Tester', 12),
+(4, 101, 'Developer', 8),
+(5, 102, 'Designer', 10),
+(6, 103, 'Tester', 14),
+(7, 101, 'Manager', 20),
+(8, 102, 'Tester', 8),
+(9, 103, 'Developer', 15),
+(10, 101, 'Developer', 10),
+(11, 102, 'Designer', 12),
+(12, 103, 'Manager', 14),
+(1, 102, 'Developer', 10),
+(2, 103, 'Manager', 15),
+(3, 101, 'Tester', 12),
+(4, 102, 'Developer', 8),
+(5, 103, 'Designer', 10),
+(6, 101, 'Tester', 14),
+(7, 102, 'Manager', 20),
+(8, 103, 'Tester', 8),
+(9, 101, 'Developer', 15),
+(10, 102, 'Developer', 10),
+(11, 103, 'Designer', 12),
+(12, 101, 'Manager', 14);
+
+select * from salarie;
+select * from service;
+select * from projet;
+select * from participation;
+
+select numser,max(salaire) from salarie group by numser;
+select e.numser,s.nomservice,e.salaire from salarie e inner join service s using(numser) where numser = 10;
+select e.matricule,e.nom,count(p.matricule),sum(p.nbrjours) from salarie e inner join participation p using(matricule) group by e.matricule;
+select e.numser,s.nomservice,sum(e.salaire)+sum(e.prime) from salarie e inner join service s using(numser) group by numser;
+select e.numser,s.nomservice,count(e.matricule) from salarie e inner join service s using(numser) where e.salaire > (select avg(salaire) from salarie where poste != 'Manager') group by numser;
+select e.matricule,e.nom from salarie e left join participation p using(matricule) where p.matricule is null;
+select e.matricule,e.nom from salarie e left join participation p using(matricule) group by e.matricule having count(p.matricule) >= 2;
+
+
+-- Exercice 4:
+use exercice3tp5;
+create table patient(
+idpt int primary key,
+nom varchar(30),
+sexe varchar(30),
+adresse varchar(30),
+ville varchar(30)
+);
+
+create table medecin (
+idmed int primary key,
+nom varchar(30),
+adresse varchar(30),
+specialite varchar(30)
+);
+
+create table consultation (
+Nocons int primary key,
+idpt int,
+idmed int,
+datee date,
+prix int,
+foreign key (idpt) references patient(idpt),
+foreign key (idmed) references medecin(idmed)
+);
+drop database tp05;
+create database tp05;
+use tp05;
+select * from patient;
+select * from medecin;
+select * from consultation;
+-- Inserting sample values into Patient
+INSERT INTO Patient VALUES (1, 'patient1', 'M', 'adresse01', 'ville01');
+INSERT INTO Patient VALUES (2, 'patient2', 'F', 'adresse02', 'ville02');
+INSERT INTO Patient VALUES (3, 'patient3', 'F', 'adresse03', 'ville03');
+
+-- Inserting sample values into Medecin
+INSERT INTO Medecin VALUES (1, 'Dr4', 'adresse04', 'specialite04');
+INSERT INTO Medecin VALUES (2, 'Dr5', 'adresse05', 'specialite05');
+INSERT INTO Medecin VALUES (3, 'Dr6', 'adresse06', 'specialite06');
+INSERT INTO Medecin VALUES (4, 'Dr7', 'adresse07', 'pediatre');
+INSERT INTO Medecin VALUES (5, 'Dr8', 'adresse08', 'pediatre');
+
+-- Inserting sample values into Consultation
+INSERT INTO Consultation VALUES (1, 1, 1, '2022-01-15', 100.00);
+INSERT INTO Consultation VALUES (2, 2, 2, '2022-02-01', 120.00);
+INSERT INTO Consultation VALUES (3, 3, 3, '2022-03-01', 880.00);
+INSERT INTO Consultation VALUES (4, 3, 3, '2023-03-01', 280.00);
+INSERT INTO Consultation VALUES (5, 3, 5, '2024-01-01', 380.00);
+INSERT INTO Consultation VALUES (6, 1, 5, '2020-09-11', 230.00);
+
+select specialite,count(idmed) from medecin group by specialite; 
+select m.nom,count(distinct c.nocons) from medecin m inner join consultation c using(idmed) group by idmed;
+select p.nom,count(c.nocons) from patient p inner join consultation c using(idpt) group by p.idpt;
+select p.nom,sum(c.prix) from patient p inner join consultation c using(idpt) where c.datee between '2009-15-10' and curdate() group by p.idpt;
+select m.idmed,m.nom,sum(c.prix)
+from medecin m inner join consultation c using(idmed)
+where c.datee = (select max(datee) from consultation where idmed = m.idmed)
+group by idmed;
+select * from consultation c inner join medecin m using(idmed) where m.specialite = 'pediatre';
+
+
+SELECT P.*
+FROM Patient P  
+WHERE P.IDPt  IN (SELECT DISTINCT c.idpt FROM Consultation c WHERE  timestampdiff(YEAR, c.datee, curdate()) >=3);
+
+select  p.idpt, max(c.datee)
+from patient p inner join consultation c on p.idpt = c.idpt
+group by c.datee
+having c.datee = max(c.datee);
+
+
+
+select* from patient p inner join consultation c on p.idpt = c.idpt ;
+SELECT DISTINCT IDPt FROM Consultation WHERE  timestampdiff(YEAR, datee, curdate()) >1;
+select timestampdiff(YEAR, datee, CurDate()) from consultation;
+
+
+select p.*
+from patent p 
+inner join consultation c 
+
+-- Exercice 5:
+create database exercice5tp5;
+use exercice5tp5;
+create table ville (
+    codepostal int primary key,
+    nomville varchar(30)
+);
+
+create table cinema (
+    numcinema int primary key,
+    nomcinema varchar(30),
+    ruecinema varchar(30),
+    codepostal int,
+    foreign key (codepostal) references ville(codepostal)
+);
+
+create table salle (
+    numsalle int primary key,
+    capacite int,
+    numcinema int,
+    foreign key (numcinema) references cinema(numcinema)
+);
+
+create table film (
+    numfilm int primary key,
+    titre varchar(30),
+    duree int,
+    producteur varchar(30)
+);
+
+create table projection (
+    num_p int primary key,
+    numfilm int,
+    numsalle int,
+    date date,
+    nbreentrees int,
+    foreign key (numfilm) references film(numfilm),
+    foreign key (numsalle) references salle(numsalle)
+);
+
+select * from cinema;
+select * from ville;
+select * from salle;
+select * from film;
+select * from projection;
+
+-- Inserting sample values into Ville
+INSERT INTO Ville VALUES (1001, 'City A');
+INSERT INTO Ville VALUES (1002, 'City B');
+INSERT INTO Ville VALUES (1003, 'City C');
+
+-- Inserting sample values into Cinéma
+INSERT INTO Cinema VALUES (1, 'Cinema 1', '123 Main St', 1001);
+INSERT INTO Cinema VALUES (2, 'Cinema 2', '456 Oak St', 1002);
+INSERT INTO Cinema VALUES (3, 'Cinema 3', '789 Pine St', 1003);
+
+-- Inserting sample values into Salle
+INSERT INTO Salle VALUES (101, 200, 1);
+INSERT INTO Salle VALUES (102, 150, 2);
+INSERT INTO Salle VALUES (103, 180, 3);
+
+-- Inserting sample values into Film
+INSERT INTO Film VALUES (10001, 'Film A', 120, 'Producteur 1');
+INSERT INTO Film VALUES (10002, 'Film B', 90, 'Producteur 2');
+INSERT INTO Film VALUES (10003, 'Film C', 110, 'Producteur 3');
+INSERT INTO Film VALUES (10004, 'Film D', 120, 'Producteur 4');
+INSERT INTO Film VALUES (10005, 'Film E', 88, 'Producteur 5');
+
+-- Inserting sample values into Projection
+INSERT INTO Projection VALUES (1001, 10001, 101, '2011-08-25', 120);
+INSERT INTO Projection VALUES (1002, 10002, 102, '2011-08-25', 90);
+INSERT INTO Projection VALUES (1003, 10003, 103, '2011-08-25', 150);
+INSERT INTO Projection VALUES (1004, 10005, 101, '2011-08-25', 50);
+INSERT INTO Projection VALUES (1005, 10005, 101, '2012-10-25', 40);
+INSERT INTO Projection VALUES (1006, 10005, 101, '2011-08-25', 40);
+INSERT INTO Projection VALUES (1007, 10005, 101, '2011-08-25', 40);
+INSERT INTO Projection VALUES (1008, 10005, 102, '2011-10-23', 21);
+
+
+select v.nomville,count(c.numcinema) from ville v inner join cinema c using(codepostal) group by nomville;
+
+select c.nomcinema,sum(e.capacite) from cinema c inner join salle e using(numcinema) group by numcinema;
+
+select f.titre,p.nbreentrees,s.capacite from film f join projection p using(numfilm) join salle s using(numsalle) where p.nbreentrees < s.capacite * 0.3;
+
+-- select * from projection p inner join film f on p.numfilm = f.numfilm where date = '2011-08-25' ;
+select count(numfilm) from film f inner join projection p on f.numfilm = p.numfilm where date = '2011-08-25';
+select f.titre,count(p.numfilm) from film f inner join projection p using(numfilm) where p.date between '2011-10-20' and '2011-10-25' group by numfilm;
+
+select  p.*
+from projection p 
+inner join film cf
+on p.numfilm = c.numfilm 
+group by p.idpt 
+having max(c.datee)<date_sub(curdate(),interval 2 year);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- EX04
+use tp5;
+
+create database tp5;
+
+create table patient(
+     idpt int primary key ,
+     nom varchar (30),
+     sexe varchar (30),
+     adresse varchar (30),
+     ville varchar (30)
+);
+
+create table medecin (
+    idmed int primary key ,
+    nom varchar (30) ,
+    specialite varchar (30)
+);
+
+create table consultation(
+    nocos int primary key ,
+    idpt int , 
+    idmed int ,
+    Date date ,
+    prix float ,
+    constraint fk_idpt foreign key consultation(idpt) references patient(idpt),
+    constraint fk_idmed foreign key consultation(idmed) references medecin(idmed)
+);
+select*from patient ;
+
+select * from medecin ;
+
+select * from consultation ;
+ use tp05;
+-- 1
+select specialite,count(idmed) as "le nombre de médecins"
+from medecin
+group by specialite ;
+
+-- 2
+select idmed,count(distinct idpt) as "le nombre de patients"
+from consultation 
+group by idmed ;
+
+-- 3
+select p.idpt,p.nom,count(distinct c.idmed) as "nombre de médecins "
+from consultation c
+inner join patient p
+on p.idpt=c.idpt
+group by idpt ;
+
+-- 4
+select p.idpt,p.nom , sum(c.prix) as'somme totale'
+from patient p
+inner join consultation c
+on p.idpt=c.idpt
+where c.datee between "2009-10-16" and "2030-11-22"
+group by c.idpt ;
+
+-- 5
+select c.idmed,m.nom  ,sum(c.prix) as'somme total' 
+from medecin m
+inner join consultation c                         
+on m.idmed=c.idmed
+where c.datee=(select max(datee) from consultation where idmed=m.idmed)
+group by c.idmed
+;
+ 
+ -- 6
+select c.nocons, c.idpt, c.Datee, c.prix
+from medecin m 
+inner join consultation c 
+on c.idmed=m.idmed 
+where m.specialite='Pediatre';
+
+-- 7
+select  p.*
+from patient p 
+inner join consultation c 
+using(idpt) 
+group by p.idpt 
+having max(c.datee)<date_sub(curdate(),interval 2 year);
